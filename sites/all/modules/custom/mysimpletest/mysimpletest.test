@@ -1,0 +1,42 @@
+<?php
+
+
+
+//
+
+
+class SimpleTestCreate extends DrupalWebTestCase {
+
+	protected $priviledUser;
+
+	public static function getInfo() {
+		return [
+			'name' => 'Simplet test example',
+			'description' => 'Description of the simplete test example',
+			'group' =>'MyTest'
+		];
+	}
+
+	public function setUp() {
+		// create a user with following pages
+		parent::setUp('mysimpletest');
+
+		$this->priviledUser = $this->drupalCreateUser(['create simpletest_type content','extra field from my simpletest
+']);
+		$this->drupalLogin($this->priviledUser);
+	}
+
+
+	public function createAtest() {
+
+		$edit['title'] = $this->randomName(8);
+
+		$edit['body[0][und][value]'] =  $this->randomName(16);
+
+		$this->drupalPost('node/add/simpletest-type', $edit, t('Save'));
+
+		$this->assertText(t('Simple Test Example Node Type @title has been created', ['@title' => $edit['title']]));
+	}
+
+
+}

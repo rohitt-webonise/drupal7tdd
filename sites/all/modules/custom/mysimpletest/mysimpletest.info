@@ -1,0 +1,7 @@
+name = MyTest
+description=This module usded for learning test in drupal
+core=7.x
+version=1
+
+dependencies[] = simpletest
+files[] = mysimpletest.test
