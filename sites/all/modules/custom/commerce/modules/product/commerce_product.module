@@ -1,0 +1,146 @@
+<?php
+
+
+function commerce_product_entity_info() {
+	$return = [
+	 'commerce_product' => [
+	 	'label' => t('Commerce Product'),
+	 	'controller class' => 'CommerceProductEntityController',
+	 	'base table' => 'commerce_product',
+	 	'revision_table' => 'commerce_product_revision',
+	 	'fieldable' => TRUE,
+	 	'entity keys' => [
+	 		'id' => 'product_id',
+	 		'bundle' => 'type',
+	 		'label' => 'title',
+	 		'revision' => 'revision_id',
+	 		'language' => 'language'
+	 	],
+	 	'bundle keys' => [
+	 		'bundle' => 'type'
+	 	],
+	 	'bundles' => [
+
+	 	],
+	 	'load hook' => 'commerce_product_load',
+	 	'view modes' => [
+	 		'full' => [
+	 			'label' => t('Admin display'),
+	 			'custom settings' => FALSE
+	 		],
+
+	 	],
+	 	'uri callback' => 'commerce_product_uri',
+	 	'metadata contoller class' => '',
+	 	'token-type' => 'commerce-product',
+	 	'access callback' => 'commmerce_entity_access',
+	 	'access arguments' => [
+	 		'user key' => 'uid',
+	 		'access tag' => 'commmerce_product_acess'
+	 	] ,
+	 	'permission labels' => [
+	 		'singular' => t('product'),
+	 		'plural' => t('products'),
+	 	],
+	 	'redirect' => FALSE,
+	 	      // Add translation support.
+	      'translation' => array(
+	        'locale' => TRUE,
+	        'entity_translation' => array(
+	          'class' => 'EntityTranslationCommerceProductHandler',
+	          'bundle callback' => 'commerce_product_entity_translation_supported_type',
+	          'default settings' => array(
+	            'default_language' => LANGUAGE_NONE,
+	            'hide_language_selector' => FALSE,
+	          ),
+	        ),
+	      ),
+
+	            // Add title replacement support for translations.
+	      'field replacement' => array(
+	        'title' => array(
+	          'field' => array(
+	            'type' => 'text',
+	            'cardinality' => 1,
+	            'translatable' => TRUE,
+	          ),
+	          'instance' => array(
+	            'label' => t('Title'),
+	            'required' => TRUE,
+	            'settings' => array(
+	              'text_processing' => 0,
+	            ),
+	            'widget' => array(
+	              'weight' => -5,
+	            ),
+	          ),
+	        ),
+	      ),
+	 ],
+	];
+
+	$return['commerce_product']['bundles'] = [];
+
+	foreach (commerce_product_type_get_name() as $type => $name) {
+		$return['commerce_product']['bundles'][$type] = [
+			'label' => $name
+		];
+	}
+
+	return $return;
+}
+
+
+
+function commmerce_product_uri($product) {
+
+	foreach (module_implements('commerce_product_uri') as $module) {
+		$uri = module_invoke($module, 'commerce_product_uri', $product);
+
+		if (!empty($uri)) {
+			return $uri;
+		}
+	}
+
+	return NULL;
+}
+
+function commerce_product_type_get_name($type = NULL) {
+	$product_types = commerce_product_types();
+
+	if (!empty($type)) {
+		if(isset($product_types[$type])) {
+			return $product_types[$type]['name'];
+		} else {
+			return FALSE;
+		}
+	}
+
+	$product_type_names = [];
+
+	foreach ($product_types as $key => $value) {
+		$product_type_names[$key] = $value['name'];
+	}
+
+	return $product_type_names;
+}
+
+
+function commerce_product_types() {
+	$product_types = &drupal_static(__FUNCTION__);
+	if (!isset($product_types)) {
+		$product_types = [];
+
+		foreach (module_implements('commerce_product_type_info') as $module) {
+			foreach ($module_invoke($module, 'commerce_product_type_info') as $type => $product_type) {
+				$product_types += [
+				  'module' => $module,
+				  'revision' => 1,
+				];
+				$product_types[$type] = $product_type; 
+			}
+		}
+		drupal_alter('commerce_product_type_info', $product_types);
+	}
+	return $product_types;
+}
