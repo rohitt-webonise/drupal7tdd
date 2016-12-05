@@ -249,7 +249,7 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'drupal',
+      'database' => 'drupal7tdd',
       'username' => 'root',
       'password' => 'root',
       'host' => 'localhost',

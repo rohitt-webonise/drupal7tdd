@@ -1,13 +1,8 @@
 <?php
-
 function mysimpletest_install() {
-	// reset node typ
-
-	node_types_rebuild();
-
-
-	//getting node types and add body field to the simplte test node type 
-	$types =  node_type_get_types();
-	node_add_body_field($types['simpletest_type']);
-
+// reset node typ
+  node_types_rebuild();
+//getting node types and add body field to the simplte test node type
+  $types =  node_type_get_types();
+  node_add_body_field($types['simpletest_type']);
 }
