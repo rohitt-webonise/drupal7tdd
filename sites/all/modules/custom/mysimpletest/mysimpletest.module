@@ -2,48 +2,45 @@
 
 
 
-// create a node type
+/**
+ * @file 
+ *	Implements hook_node_info()
+ */
 
 
 function mysimpletest_node_info() {
-	$node_type['simpletest_type'] = [
-		'name' => t('Simple Test Example Node Type'),
-		'base' => 'simpletest_example',
-		'description' => t('Simple test example node page test type'),
-	];
+  $node_type['simpletest_type'] = [
+	'name' => t('Simple Test Example Node Type'),
+	'base' => 'mysimpletest',
+	'description' => t('Simple test example node page test type'),
+  ];
 
-	return $node_type;
-
+ return $node_type;
 }
 
 //creating permission
 
 function mysimpletest_permission() {
-	$perm['extra field from my simpletest'] = [
-		'title' =>'Extra field from My Simpletest',
-		'description' => "Testing dude"
-	];
-	return $perm;
+  $perm['extra special edit any simpletest type content'] = [
+    'title' =>'Extra field from My Simpletest',
+	'description' => "Testing dude"
+  ];
+  return $perm;
 }
 
 // chekcing access permission
 
 
 function mysimpletest_node_access($node, $op, $account) {
-
-
-	$type = is_string($node)? $node: $node->type;
-
-	if ( ($type != 'simpletest_type') || ($op !='update' && $op !='delete')) {
-		return NODE_ACCESS_IGNORE;
+  $type = is_string($node)? $node: $node->type;
+  if ( ($type != 'simpletest_type') || ($op !='update' && $op !='delete')) {
+    	return NODE_ACCESS_IGNORE;
 	}
-
-		// if its simplete test and user has access to permissino the return true
-	if ( ($op == 'delete') && (user_access('extra field from my simpletest', $account) && ($account->uid == $node->uid))) {
+  // if its simplete test and user has access to permissino the return true
+  if ( ($op == 'delete') && (user_access('extra special edit any simpletest type content', $account) && ($account->uid == $node->uid))) {
 		return NODE_ACCESS_ALLOW;
-	}
-
-	return NODE_ACCESS_DENY;
+  }
+  return NODE_ACCESS_DENY;
 }
 
 
@@ -70,6 +67,5 @@ function mysimpletest_empty_mysql_date($date) {
 	if ( empty($date) || $date == '0000-00-00' || $date = '0000-00-00 00:00:00') {
 		return TRUE;
 	}
-
 	return FALSE;
 }
