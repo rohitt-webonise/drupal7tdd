@@ -13,7 +13,7 @@ class SimpleTestCreate extends DrupalWebTestCase {
 		return [
 			'name' => 'Simplet test example',
 			'description' => 'Description of the simplete test example',
-			'group' =>'MyTest'
+			'group' =>'ZMyTest'
 		];
 	}
 
@@ -21,22 +21,84 @@ class SimpleTestCreate extends DrupalWebTestCase {
 		// create a user with following pages
 		parent::setUp('mysimpletest');
 
-		$this->priviledUser = $this->drupalCreateUser(['create simpletest_type content','extra field from my simpletest
-']);
+		$this->priviledUser = $this->drupalCreateUser(['create simpletest_type content']);
 		$this->drupalLogin($this->priviledUser);
 	}
 
 
-	public function createAtest() {
+	public function testcreateAtest() {
 
 		$edit['title'] = $this->randomName(8);
 
-		$edit['body[0][und][value]'] =  $this->randomName(16);
+		$edit["body[und][0][value]"] =  $this->randomName(16);
 
 		$this->drupalPost('node/add/simpletest-type', $edit, t('Save'));
 
-		$this->assertText(t('Simple Test Example Node Type @title has been created', ['@title' => $edit['title']]));
+		$this->assertText(t('Simple Test Example Node Type @title has been created.', ['@title' => $edit['title']]));
 	}
 
 
+	public function testEditContent() {
+
+		$create = [
+			'type' => 'simpletest_type',
+			'title' => $this->randomName(40),
+			'body' => [LANGUAGE_NONE => [[$this->randomName(40)]]]
+		];
+
+		$node = $this->drupalCreateNode($create);
+
+		$this->verbose('Node Created' . var_export($node, TRUE));
+
+		if (!$this->runningOnTestbot()) {
+			debug('Thisi sdebug');
+			$this->drupalGet("node/{$node->nid}/edit");
+			$this->assertResponse(200, "User is allowed to edit the content");
+			$this->assertText(t('@title', ['@title' => $settings['title']]), "Found title in edit form");
+		}
+	}
+
+	public function runningOnTestbot() {
+      // @todo: Add this line back once the testbot variable is available.
+      // https://www.drupal.org/node/2565181
+      // return env('DRUPALCI');
+      return TRUE;
+  	}
 }
+
+
+class MySampleUnitTestCase extends DrupalUnitTestCase {
+
+	public static function getInfo() {
+		return [
+			'name' => "Sample Unit Test",
+			'description' => 'Unit Test for function return try if date is empty',
+			'group' => 'ZMyTest'
+		];
+	}
+
+	public function setUp() {
+	  drupal_load('module','mysimpletest');
+	  parent::setUp();
+	}
+
+	public function testSimpleUnitTest() {
+	  $result = mysimpletest_empty_mysql_date(NULL);
+	  $message = "A NULL Value should return TRUE";
+	  $this->assertTrue($result, $message);
+
+	  $result = mysimpletest_empty_mysql_date('');
+	  $message = "A empty string return TRUE";
+	  $this->assertTrue($result, $message);
+
+	  $result = mysimpletest_empty_mysql_date("0000-00-00");
+	  $message = "An 'Empty' msyql date should return TRUE";
+	  $this->assertTrue($result, $message);
+	  $d = date('Y-m-d');
+	  $result = mysimpletest_empty_mysql_date($d);
+	  $message = "A valid date value should return false";
+	  $this->assertFalse($result, $message);
+	}
+}
+
+

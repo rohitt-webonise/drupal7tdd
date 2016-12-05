@@ -3,7 +3,7 @@
 
 
 /**
- * @file 
+ * @file
  *	Implements hook_node_info()
  */
 
@@ -54,7 +54,7 @@ function mysimpletest_form($node, $form_state) {
 			'#required' => TRUE,
 			'#default_value' => $node->title,
 			'#maxlengtg' => 255,
-			'#weight' => -3 
+			'#weight' => -3
 		];
 	}
 
@@ -64,7 +64,7 @@ function mysimpletest_form($node, $form_state) {
 
 
 function mysimpletest_empty_mysql_date($date) {
-	if ( empty($date) || $date == '0000-00-00' || $date = '0000-00-00 00:00:00') {
+	if ( empty($date) || $date == '0000-00-00' || $date == '0000-00-00 00:00:00') {
 		return TRUE;
 	}
 	return FALSE;
